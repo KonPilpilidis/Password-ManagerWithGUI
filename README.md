@@ -1,4 +1,4 @@
-<a href="http://pilpilidis.de"><img src="https://avatars1.githubusercontent.com/u/71609885?s=400&u=c8c17cdd60c197a1003b0ae128c86069952caa4e" height="150" title="Konstantinos Pilpilidis" alt="Konstantinos Pilpilidis"></a>
+<a><img src="https://github.com/KonPilpilidis/Password-ManagerWithGUI/blob/main/logo.ico" height="150" title="PasswordManagerLogo" alt="PasswordManagerLogo"></a>
 
 <!-- [![Konstantinos Pilpilidis](https://avatars1.githubusercontent.com/u/71609885?s=400&u=c8c17cdd60c197a1003b0ae128c86069952caa4e)](http://pilpilidis.de) -->
 
