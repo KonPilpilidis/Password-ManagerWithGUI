@@ -2,6 +2,7 @@ from random import choice
 from string import ascii_letters, digits, punctuation
 import cryptography
 from cryptography.fernet import Fernet
+import csv
 import os
 
 keyFile = "key.key"
@@ -10,7 +11,7 @@ USER = "user"
 MASTER = "pass"
 SALT = "a"
 
-def createPassword(length = 8,characters = True, numbers = True, symbols = True):
+def createPassword(length = 8,characters = True, numbers = True, symbols = True,method = "random"):
     """
     1. creates a random password
     2. saves the hashed password
@@ -21,8 +22,37 @@ def createPassword(length = 8,characters = True, numbers = True, symbols = True)
     :return: str password
     """
     assert type(length) == int and length > 3 and length < 32, "The size of the password must be an integer number between 3 and 20"
-
-    def generatePassword():
+    assert method in (),"The chosen method is not available"
+    def generatePasswordDiceware(lenght=5,delimiter=" "):
+        def readInDictionnairy():
+            """
+            The method read into memory the diceware dictionairy
+            """
+            reader = csv.reader(open("dicewaredict.csv",'r'),delimiter="\t")
+            dict_list = {}
+            for line in reader:
+                dict_list[line[0]] = line[1]
+            return dict_list
+        def diceRoll():
+            """
+            The method rolls a number of dice to select a word.
+            """
+            set = ["1","2","3","4","5","6"]
+            roll = ""
+            for i in range(4):
+                roll += choice(set)
+            return roll
+        
+        dictionnairy = readInDictionnairy()
+        password = ""
+        for i in range(length):
+            password += dictionnairy[diceRoll()] + delimiter
+        return password
+        
+        
+        
+            
+    def generatePasswordRandom():
         """
         Generates a password of length = arg1
         returns str
@@ -30,7 +60,9 @@ def createPassword(length = 8,characters = True, numbers = True, symbols = True)
         user_password = ""
         for i in range(length):
             user_password += choice(ascii_letters * characters + digits * numbers + punctuation * symbols)
-        return user_password, USER + SALT + user_password + choice(ascii_letters) + MASTER
+        return user_password, choice(ascii_letters)+ USER + SALT + user_password + MASTER
+
+def encrypt():
     def generateKey():
         """
         Generates a unique encryption key with which to encrypt each password and writes it on a file.
@@ -43,7 +75,7 @@ def createPassword(length = 8,characters = True, numbers = True, symbols = True)
             if os.path.isfile('./' + keyFile) and os.access('./' + keyFile, os.R_OK):
                 with open(keyFile, 'r') as f:
                     i = 0
-                    for i, l in enumerate(f,):
+                    for i, l in enumerate(f,2):
                         pass
                 return i
             else:
@@ -60,8 +92,7 @@ def createPassword(length = 8,characters = True, numbers = True, symbols = True)
     encrypted = f.encrypt(hashable_password)
     with open(passwordFile,'a') as file:
         file.write(str(index )+ ',' + encrypted.decode('utf-8') + '\n')
-    return password
-
+    
 def decrypt(hash):
     pass
 
