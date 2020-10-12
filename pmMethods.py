@@ -11,57 +11,58 @@ USER = "user"
 MASTER = "pass"
 SALT = "a"
 
-def createPassword(length = 8,characters = True, numbers = True, symbols = True,method = "random"):
-    """
-    1. creates a random password
-    2. saves the hashed password
-    :param length: number of characters of password
-    :param characters: a boolean for whether the password should contain characters
-    :param numbers: a boolean for whether the password should contain digits
-    :param symbols: a boolean for whether the password should contain symbols
-    :return: str password
-    """
-    assert type(length) == int and length > 3 and length < 32, "The size of the password must be an integer number between 3 and 20"
-    assert method in (),"The chosen method is not available"
-    def generatePasswordDiceware(lenght=5,delimiter=" "):
-        def readInDictionnairy():
-            """
-            The method read into memory the diceware dictionairy
-            """
-            reader = csv.reader(open("dicewaredict.csv",'r'),delimiter="\t")
-            dict_list = {}
-            for line in reader:
-                dict_list[line[0]] = line[1]
-            return dict_list
-        def diceRoll():
-            """
-            The method rolls a number of dice to select a word.
-            """
-            set = ["1","2","3","4","5","6"]
-            roll = ""
-            for i in range(4):
-                roll += choice(set)
-            return roll
-        
-        dictionnairy = readInDictionnairy()
-        password = ""
-        for i in range(length):
-            password += dictionnairy[diceRoll()] + delimiter
-        return password
-        
-        
-        
-            
-    def generatePasswordRandom():
+class Password(object):    
+    @staticmethod
+    def createPassword(length = 8,characters = True, numbers = True, symbols = True,method = "random",delimiter=" "):
         """
-        Generates a password of length = arg1
-        returns str
+        1. creates a random password
+        2. saves the hashed password
+        :param length: number of characters of password
+        :param characters: a boolean for whether the password should contain characters
+        :param numbers: a boolean for whether the password should contain digits
+        :param symbols: a boolean for whether the password should contain symbols
+        :return: str password
         """
-        user_password = ""
-        for i in range(length):
-            user_password += choice(ascii_letters * characters + digits * numbers + punctuation * symbols)
-        return user_password, choice(ascii_letters)+ USER + SALT + user_password + MASTER
-
+        assert type(length) == int and length > 3 and length < 32, "The size of the password must be an integer number between 3 and 20"
+        assert method in ('random','diceware'),"The chosen method is not available"
+        def generatePasswordDiceware():
+            def readInDictionnairy():
+                """
+                The method read into memory the diceware dictionairy
+                """
+                reader = csv.reader(open("dicewaredict.csv",'r'),delimiter="\t")
+                dict_list = {}
+                for line in reader:
+                    dict_list[line[0]] = line[1]
+                return dict_list
+            def diceRoll():
+                """
+                The method rolls a number of dice to select a word.
+                """
+                set = ["1","2","3","4","5","6"]
+                roll = ""
+                for i in range(4):
+                    roll += choice(set)
+                return roll
+            dictionnairy = readInDictionnairy()
+            password = ""
+            for i in range(length):
+                password += dictionnairy[diceRoll()] + delimiter
+            return password
+        def generatePasswordRandom():
+            """
+            Generates a password of length = arg1
+            returns str
+            """
+            password = ""
+            for i in range(length):
+                password += choice(ascii_letters * characters + digits * numbers + punctuation * symbols)
+            return password, choice(ascii_letters)+ USER + SALT + password + MASTER
+        if method == "random":
+            return generatePasswordRandom()
+        else:
+            return generatePasswordDiceware()
+print(Password.createPassword())
 def encrypt():
     def generateKey():
         """
