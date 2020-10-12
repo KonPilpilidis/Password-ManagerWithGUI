@@ -13,7 +13,7 @@ SALT = "a"
 
 class Password(object):    
     @staticmethod
-    def createPassword(length = 8,characters = True, numbers = True, symbols = True,method = "random",delimiter=" "):
+    def create(lengthChar = 8,lengthWord=4,characters = True, numbers = True, symbols = True,method = "random",delimiter=" "):
         """
         1. creates a random password
         2. saves the hashed password
@@ -23,9 +23,10 @@ class Password(object):
         :param symbols: a boolean for whether the password should contain symbols
         :return: str password
         """
-        assert type(length) == int and length > 3 and length < 32, "The size of the password must be an integer number between 3 and 20"
+        assert type(lengthChar) == int and lengthChar > 3 and lengthChar < 31, "The size of the password must be an integer number between 4 and 30"
+        assert type(lengthWord) == int and lengthWord > 3 and lengthChar < 11, "The number of words in the password must be an integer number between 4 and 10"
         assert method in ('random','diceware'),"The chosen method is not available"
-        def generatePasswordDiceware():
+        def generateDiceware():
             def readInDictionnairy():
                 """
                 The method read into memory the diceware dictionairy
@@ -41,60 +42,62 @@ class Password(object):
                 """
                 set = ["1","2","3","4","5","6"]
                 roll = ""
-                for i in range(4):
+                for i in range(5):
                     roll += choice(set)
                 return roll
             dictionnairy = readInDictionnairy()
             password = ""
-            for i in range(length):
+            for i in range(lengthWord):
                 password += dictionnairy[diceRoll()] + delimiter
             return password
-        def generatePasswordRandom():
+        def generateRandom():
             """
             Generates a password of length = arg1
             returns str
             """
             password = ""
-            for i in range(length):
+            for i in range(lengthChar):
                 password += choice(ascii_letters * characters + digits * numbers + punctuation * symbols)
-            return password, choice(ascii_letters)+ USER + SALT + password + MASTER
+            return password
         if method == "random":
-            return generatePasswordRandom()
+            return generateRandom()
         else:
-            return generatePasswordDiceware()
-print(Password.createPassword())
-def encrypt():
-    def generateKey():
-        """
-        Generates a unique encryption key with which to encrypt each password and writes it on a file.
-        returns byte and int
-        """
-        def count_keys():
-            """
-            Counts the number of passwords generated and writes the id of the password which can be decrypted with each key.
-            """
-            if os.path.isfile('./' + keyFile) and os.access('./' + keyFile, os.R_OK):
-                with open(keyFile, 'r') as f:
-                    i = 0
-                    for i, l in enumerate(f,2):
-                        pass
-                return i
-            else:
-                return 1
-        key = Fernet.generate_key()
-        i=count_keys()
-        with open(keyFile, 'a') as file:  # Open the file as wb to write bytes
-            file.write(str(i)+" "+str(key.decode("utf-8"))+"\n")  # The key is type bytes still
-        return key, i
-    key, index = generateKey()
-    password, hashable_password = generatePassword()
-    hashable_password = hashable_password.encode()
-    f = Fernet(key)
-    encrypted = f.encrypt(hashable_password)
-    with open(passwordFile,'a') as file:
-        file.write(str(index )+ ',' + encrypted.decode('utf-8') + '\n')
+            return generateDiceware()
     
-def decrypt(hash):
-    pass
-
-print(createPassword())
+    @staticmethod
+    def encryptForSave(password):
+        def generateKey():
+            """
+            Generates a unique encryption key with which to encrypt each password and writes it on a file.
+            returns byte and int
+            """
+            def count_keys():
+                """
+                Counts the number of passwords generated and writes the id of the password which can be decrypted with each key.
+                """
+                if os.path.isfile('./' + keyFile) and os.access('./' + keyFile, os.R_OK):
+                    with open(keyFile, 'r') as f:
+                        i = 0
+                        for i, l in enumerate(f,2):
+                            pass
+                    return i
+                else:
+                    return 1
+            key = Fernet.generate_key()
+            i=count_keys()
+            with open(keyFile, 'a') as file:  # Open the file as wb to write bytes
+                file.write(str(i)+" "+str(key.decode("utf-8"))+"\n")  # The key is type bytes still
+            return key, i
+        def saltPepperPass():
+            distorted = USER + SALT + password + choice(ascii_letters) + MASTER
+            return distorted.encode()
+        key, index = generateKey()
+        cipher = Fernet(key)
+        hashed_password = cipher.encrypt(saltPepperPass())
+        with open(passwordFile,'a') as file:
+            file.write(str(index )+ ',' + hashed_password.decode('utf-8') + '\n')
+        print(hashed_password)
+    
+    def decrypt(hash):
+        pass
+print(Password.encryptForSave(Password.create(method="diceware")))
