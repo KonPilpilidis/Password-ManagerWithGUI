@@ -3,6 +3,7 @@ from tkinter import filedialog, Text
 from theme_module import *
 from pmMethods import *
 root = tk.Tk()
+root.geometry(WindowsSize)
 root.title(TITLE+' '+VERSION)
 if platform.system() != "Linux":
     root.iconbitmap(LOGO)

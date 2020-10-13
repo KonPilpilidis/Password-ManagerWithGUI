@@ -11,6 +11,18 @@ USER = "user"
 MASTER = "pass"
 SALT = "a"
 
+class Backend(object):
+    def __init__(self):
+        salt = ""
+        for i in range(4):
+            salt += choice(ascii_letters + digits + punctuation)
+        with open('key.key' , 'w') as fp:
+            pass
+        with open('archive.csv' , 'w') as fp:
+            pass
+        with open('config.conf' , 'w') as fp:
+            pass
+
 class Password(object):    
     @staticmethod
     def create(lengthChar = 8,lengthWord=4,characters = True, numbers = True, symbols = True,method = "random",delimiter=" "):
@@ -89,6 +101,7 @@ class Password(object):
                 file.write(str(i)+" "+str(key.decode("utf-8"))+"\n")  # The key is type bytes still
             return key, i
         def saltPepperPass():
+            with 
             distorted = USER + SALT + password + choice(ascii_letters) + MASTER
             return distorted.encode()
         key, index = generateKey()
