@@ -1,9 +1,9 @@
+import Frontend
+import Backend
 import tkinter as tk
 from tkinter import filedialog, Text
-from theme_module import *
-from pmMethods import *
 root = tk.Tk()
-root.geometry(WindowsSize)
+root.geometry(Frontend.WindowsSize)
 root.title(TITLE+' '+VERSION)
 if platform.system() != "Linux":
     root.iconbitmap(LOGO)

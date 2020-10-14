@@ -36,8 +36,13 @@ $ brew install fvcproductions
 
 ##Features
 ### Password generation
-After logging in the user can generate password of different length after choosing which groups of ASCII 
-characters to include (letters, numbers, punctuation symbols).
+<ul>
+<li> <em>Random Alphanumerical password</em>: The program generates a password of a user defined length after the user 
+chooses which groups of ASCII characters to include (letters, numbers, punctuation symbols).
+<li> <em> Diceware password</em>: The program generates a password containing a user defined number of words from a 
+dictionnairy separated by a user defined delimiter.
+</ul>
+
 ### Password hashing
 The programm peppers and salts the password and hashes the password using a uniquely generated Fernet key
 ### Password storage
