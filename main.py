@@ -1,15 +1,16 @@
-import Frontend
-import Backend
+from Modules import Frontend
+#import Backend
 import tkinter as tk
-from tkinter import filedialog, Text
+
 root = tk.Tk()
 root.geometry(Frontend.WindowsSize)
-root.title(TITLE+' '+VERSION)
-if platform.system() != "Linux":
-    root.iconbitmap(LOGO)
-else:
-    root.tk.call('wm', 'iconphoto', root._w, tk.Image('photo',file=LOGO))
-canvas = tk.Canvas(root, height = Height, width = Width, bg = bgColor)
+root.title(Frontend.TITLE + ' ' + Frontend.VERSION)
+try:
+    root.iconbitmap(Frontend.LOGO_win)
+except:
+    root.tk.call('wm', 'iconphoto', root._w, tk.Image('photo', file=Frontend.LOGO_other))
+    print("Entered")
+canvas = tk.Canvas(root, height = Frontend.Height, width = Frontend.Width, bg = Frontend.bgColor)
 # frame = tk.Frame(root, bg = windowColor)
 # labelMain = tk.Label(text="Main Menu")
 # labelMain.pack()

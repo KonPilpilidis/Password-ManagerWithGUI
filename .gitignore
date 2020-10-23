@@ -1,5 +1,7 @@
 archive.csv
 key.key
-id_rsa
-id_rsa_pub
+id_rsa.pub
+id_rsa.pub.pub
 logo.xcf
+.idea/
+__pycache__/
