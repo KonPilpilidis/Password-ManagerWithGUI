@@ -77,6 +77,11 @@ class Manager(object):
             backend=default_backend()
         )
         return base64.urlsafe_b64encode(kdf.derive(passphrase))  # Can only use kdf once
+    def login(self,username,masterpassword):
+
+
+
+
     def encrypt(self,passphrase, username, masterpassword):
         """
         The method encrypts a password. (Not necessarily created with the classes methods)
