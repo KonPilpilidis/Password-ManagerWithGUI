@@ -1,14 +1,15 @@
 import tkinter as tk
 from tkinter import ttk,StringVar,IntVar
-
+import os
 ###################################
 ##         Theme Module          ##
 ###################################
+path = os.path.join(os.path.expanduser('~'),'resources',)
 TITLE = "Password Manager"
 
 VERSION = "0.0.1"
-LOGO_win = "../logo.ico"
-LOGO_other = "./resources/logo.gif"
+LOGO_win = os.path.join(os.getcwd(),'resources',"logo.ico")
+LOGO_other = os.path.join(os.getcwd(),'resources',"logo.gif")
     
 # Geometry
 WFACT = 0.500
