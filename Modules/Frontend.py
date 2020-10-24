@@ -7,8 +7,8 @@ from tkinter import ttk,StringVar,IntVar
 TITLE = "Password Manager"
 
 VERSION = "0.0.1"
-LOGO_win = "..\logo.ico"
-LOGO_other = ".\resources\logo.gif"
+LOGO_win = "../logo.ico"
+LOGO_other = "./resources/logo.gif"
     
 # Geometry
 WFACT = 0.500
@@ -36,6 +36,7 @@ class MainApplication(tk.Tk):
         self.title(TITLE + ' ' + VERSION)
         try:
             self.iconbitmap(LOGO_win)
+            print('entered')
         except:
             self.tk.call('wm', 'iconphoto', self._w, tk.Image('photo', file=LOGO_other))
         container = tk.Frame(self)
