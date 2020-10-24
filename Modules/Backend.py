@@ -10,16 +10,19 @@ from random import choice,sample
 from string import ascii_letters, digits, punctuation
 import csv
 from configparser import ConfigParser
-
+import os
 # File System
 STORAGE = "archive.csv"
 
+def create_user(username,password):
+    new_instance = Manager(username,password)
+    
 class Manager(object):
     """
     The object contains the general functions necessary for the manager to work.
     """
     Users = 0
-    def __init__(self):
+    def __init__(self,username,masterpassword):
         """
         Initializes the Manager object for a user:
         1. Creates the necessary files
@@ -27,29 +30,34 @@ class Manager(object):
         """
         Manager.Users += 1
         key = Fernet.generate_key()
-        keyfile = f"./resources/key{Manager.Users}.key"
-        configfile = f"./resources/config{Manager.Users}.ini"
+        keyfile = os.path.join(os.getcwd(),'resources',f"key{Manager.Users}.key")
+        configfile = os.path.join(os.getcwd(),'resources',f"config{Manager.Users}.ini")
         salt = ''
+        hashed_credentials = Fernet(self._setKey(username, masterpassword)).encrypt(username + masterpassword)
         for i in range(8):
             salt += str(choice(ascii_letters + digits + punctuation))
-        with open(self.keyfile, "wb") as file:
+        with open(keyfile, "wb") as file:
             file.write(key)
         config_object = ConfigParser()
         config_object["globals"] = {"id":Manager.Users,
                                     "salt": salt,
-                                    "key": keyfile,
+                                    "key": key,
                                     "config":configfile,
-                                    "storage":0}
+                                    "storage":0,
+                                    "credentials":hashed_credentials.decode("utf-8")}
         with open(configfile, 'w') as file:
             file.write(configfile)
-    def _getSalt(self):
+        print(configfile)
+# Setup functions
+    def _getSalt(self,usernum):
         """
         Retrieves the salt used to generate the encryption key for the password.
         :return: str
         """
         config = ConfigParser()
-        config.read('config.ini')
-        return config['globals']['salt']
+        config.read(f'config{usernum}.ini')
+        glob = config['globals']
+        return glob['salt']
     def _getMasterKey():
         """
         Retrieves the master encryption key from the current directory named `key.key`
@@ -65,7 +73,7 @@ class Manager(object):
         :param masterpassword: str for the masterpassword
         :return: bytes
         """
-        salt = self._getSalt()
+        salt = self._getSalt(Manager.Users)
         masterkey = self._getMasterKey()
         passphrase = username + salt + masterpassword  # This is input in the form of a string
         passphrase = passphrase.encode()
@@ -77,11 +85,16 @@ class Manager(object):
             backend=default_backend()
         )
         return base64.urlsafe_b64encode(kdf.derive(passphrase))  # Can only use kdf once
-    def login(self,username,masterpassword):
-
-
-
-
+# Buttons of GUI
+    @staticmethod
+    def clear_text(*args):
+        for entry in args:
+            print(entry)
+            entry.delete(0, 'end')
+    @staticmethod
+    def show_frame(container,cont):
+        frame = container.frames[cont]
+        frame.tkraise()
     def encrypt(self,passphrase, username, masterpassword):
         """
         The method encrypts a password. (Not necessarily created with the classes methods)
@@ -106,7 +119,6 @@ class Manager(object):
         """
         cipher = Fernet(Manager.getKey(username, masterpassword))
         return cipher.decrypt(toDecode)
-    def checkCredentials(self,username,password):
 
     def newEntry(self,**kwargs):
         config = ConfigParser()
@@ -333,3 +345,4 @@ class Password(object):
         :return: str
         """
         return self.phrase
+create_user("test","123")
