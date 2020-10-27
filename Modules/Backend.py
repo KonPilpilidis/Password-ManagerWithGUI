@@ -14,40 +14,62 @@ import os
 # File System
 STORAGE = "archive.csv"
 
-def create_user(username,password):
-    new_instance = Manager(username,password)
-    
 class Manager(object):
     """
     The object contains the general functions necessary for the manager to work.
     """
     Users = 0
-    def __init__(self,username,masterpassword):
+    def __init__(self,username,masterpassword,**kwargs):
         """
         Initializes the Manager object for a user:
-        1. Creates the necessary files
+        1. Creates the necessary files (config / archive)
         2. Generates the master key
         """
-        Manager.Users += 1
-        key = Fernet.generate_key()
-        keyfile = os.path.join(os.getcwd(),'resources',f"key{Manager.Users}.key")
-        configfile = os.path.join(os.getcwd(),'resources',f"config{Manager.Users}.ini")
-        salt = ''
-        hashed_credentials = Fernet(self._setKey(username, masterpassword)).encrypt(username + masterpassword)
-        for i in range(8):
-            salt += str(choice(ascii_letters + digits + punctuation))
-        with open(keyfile, "wb") as file:
-            file.write(key)
-        config_object = ConfigParser()
-        config_object["globals"] = {"id":Manager.Users,
-                                    "salt": salt,
-                                    "key": key,
-                                    "config":configfile,
+        def _genEncryptionKey():
+            passphrase = self.username + self.masterpassword  # This is input in the form of a string
+            print(passphrase)
+            passphrase = passphrase.encode()
+            kdf = PBKDF2HMAC(
+                algorithm=hashes.SHA256(),
+                length=32,
+                salt=b'W2TPM!',
+                iterations=100000,
+                backend=default_backend()
+            )
+            return base64.urlsafe_b64encode(kdf.derive(passphrase))
+        def _setSaltAndSave():
+            """
+            1. The method generates the salt used to create the encryption key for each password.
+            2. Encrypts the salt based on the user name and the password.
+            3. Writes the salts hash in the config file
+            """
+            def _genSalt():
+                salt = ''
+                for i in range(16):
+                    salt += str(choice(ascii_letters + digits + punctuation))
+                return salt
+            def _encryptSalt(key,salt):
+                return key.encrypt(salt)
+            salt = _genSalt()
+            hashed = _encryptSalt(self.key,salt)
+            self.config_object["globals"]["salt"] = hashed.encode("utf-8")
+            return salt
+        Manager.Users += 1                                           
+        self.username = username
+        self.masterpassword = masterpassword
+        self.key = _genEncryptionKey()
+        print(self.key)
+        self.config_object = ConfigParser()
+        self.salt = _setSaltAndSave()
+        hashed_credentials = self.key.encrypt(self.username + self.salt + self.masterpassword)
+        self.config_object["globals"] = {"id":Manager.Users,
                                     "storage":0,
                                     "credentials":hashed_credentials.decode("utf-8")}
+        for argument in kwargs:
+            self.config_object["auxiliary"][argument] = kwargs[argument]
+        configfile = os.path.join(os.getcwd(),'resources',f"config{Manager.Users}.ini")# The setting of a Manager object are saved here
         with open(configfile, 'w') as file:
             file.write(configfile)
-        print(configfile)
 # Setup functions
     def _getSalt(self,usernum):
         """
@@ -85,16 +107,7 @@ class Manager(object):
             backend=default_backend()
         )
         return base64.urlsafe_b64encode(kdf.derive(passphrase))  # Can only use kdf once
-# Buttons of GUI
-    @staticmethod
-    def clear_text(*args):
-        for entry in args:
-            print(entry)
-            entry.delete(0, 'end')
-    @staticmethod
-    def show_frame(container,cont):
-        frame = container.frames[cont]
-        frame.tkraise()
+# Buttons of GUI    
     def encrypt(self,passphrase, username, masterpassword):
         """
         The method encrypts a password. (Not necessarily created with the classes methods)
@@ -135,6 +148,7 @@ class Manager(object):
     #     self.Stored += 1
     #     with open(STORAGE, 'a') as file:
     #         file.write(str(self.Stored) + ',' + bpass.decode('utf-8') + '\n')
+x = Manager("test","123")
 class Password(object):
     """
     The object contains the functions to generate, encrypt and decrypt the password.
@@ -345,4 +359,3 @@ class Password(object):
         :return: str
         """
         return self.phrase
-create_user("test","123")
